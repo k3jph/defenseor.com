@@ -1,0 +1,33 @@
+name: Initialize locked build assets
+on:
+  push:
+    branches: [build/initial-site]
+    paths: [.github/workflows/bootstrap.yml]
+permissions:
+  contents: write
+jobs:
+  initialize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: build/initial-site
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --package-lock-only --ignore-scripts
+      - name: Fetch supplied identity and publication assets
+        run: |
+          mkdir -p public/assets/identity public/assets/covers
+          curl --fail --location --retry 3 'https://jameshoward.us/assets/img/identity/jh-badge-1x1.svg' -o public/assets/identity/jh-badge-1x1.svg
+          curl --fail --location --retry 3 'https://images.squarespace-cdn.com/content/v1/5a6b6f31b1ffb6024ea638b6/1520103099816-SF1507C9KYTHUYUJ2311/NScala.jpg' -o public/assets/identity/natalie-scala.jpg
+          curl --fail --location --retry 3 'https://images.tandf.co.uk/common/jackets/crclarge/978103249/9781032497488.jpg' -o public/assets/covers/second-edition.jpg
+          curl --fail --location --retry 3 'https://images.tandf.co.uk/common/jackets/crclarge/978113860/9781138607330.jpg' -o public/assets/covers/first-edition.jpg
+          file public/assets/identity/* public/assets/covers/*
+      - name: Save the initial lockfile and assets on the build branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package-lock.json public/assets
+          git diff --cached --quiet || git commit -m 'Lock initial dependencies and preserve supplied publication assets'
+          git push origin HEAD:build/initial-site
