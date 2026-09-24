@@ -2,7 +2,7 @@
 import '../styles/site.css';
 import { title as bookTitle, editors } from '../data/catalogue.mjs';
 const { title = bookTitle, description = 'Explore the chapters, contributors, and reading pathways of the Handbook of Military and Defense Operations Research.', active = '', noindex = false, schema } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const canonical = new URL(Astro.url.pathname === '/404/' ? '/404.html' : Astro.url.pathname, Astro.site);
 const nav = [['Chapters', '/chapters/'], ['Contributors', '/contributors/'], ['Reading room', '/reading-room/'], ['The book', '/book/']];
 ---
 <!doctype html>
