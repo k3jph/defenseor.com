@@ -1,0 +1,48 @@
+name: Publication source audit
+on:
+  push:
+    branches: [build/initial-site]
+    paths: [.github/workflows/source-audit.yml]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Read public records without changing production
+        run: |
+          mkdir -p artifacts/source-audit
+          python3 - <<'PY'
+          import json,time,urllib.request,urllib.parse,pathlib
+          out=pathlib.Path('artifacts/source-audit')
+          urls={
+            'crossref-book-2e.json':'https://api.crossref.org/works/10.1201/9781003396307',
+            'crossref-chapters-2e.json':'https://api.crossref.org/works?filter=isbn:9781003396307&rows=100',
+            'crossref-book-search.json':'https://api.crossref.org/works?query.bibliographic='+urllib.parse.quote('Handbook of Military and Defense Operations Research Scala Howard 2020')+'&rows=15',
+            'gdpr-cookie.js':'https://raw.githubusercontent.com/k3jph/k3jph.github.io/main/public/assets/js/gdpr-cookie.js',
+            'gdpr-cookie.css':'https://raw.githubusercontent.com/k3jph/k3jph.github.io/main/public/assets/css/gdpr-cookie.css'
+          }
+          report={}
+          for name,url in urls.items():
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'DefenseOR-publication-audit/1.0'})
+              with urllib.request.urlopen(req,timeout=40) as res:
+                data=res.read();out.joinpath(name).write_bytes(data)
+                report[name]={'url':url,'status':res.status,'bytes':len(data)}
+            except Exception as e: report[name]={'url':url,'error':str(e)}
+            time.sleep(1)
+          out.joinpath('fetch-report.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report,indent=2))
+          PY
+          curl -sSIL --max-time 30 https://defenseor.com/ > artifacts/source-audit/apex-headers.txt || true
+          curl -sSIL --max-time 30 https://www.defenseor.com/ > artifacts/source-audit/www-headers.txt || true
+          dig defenseor.com A +short > artifacts/source-audit/dns.txt
+          dig www.defenseor.com CNAME +short >> artifacts/source-audit/dns.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: publication-source-audit
+          path: artifacts/source-audit/
+          retention-days: 14
