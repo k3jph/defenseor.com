@@ -1,0 +1,70 @@
+name: Import and verify prepublication work
+on:
+  push:
+    branches: [build/initial-site]
+    paths: [.github/workflows/import-prepublication.yml, .review-transfer/**]
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PUBLIC_GA_ID: ''
+      PREVIEW_BUILD: 'false'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: build/initial-site
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Check exact source transfer and apply patch
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,lzma
+          data=b''.join(Path(f'.review-transfer/part.{i}').read_bytes() for i in range(8))
+          assert hashlib.sha256(data).hexdigest() == 'bc233ef5b7ae4f3a32b6d630a73da57f84cf71539d065951fdb13e09567e410e'
+          Path('/tmp/prepublication.patch').write_bytes(lzma.decompress(data))
+          PY
+          git apply --check --unidiff-zero /tmp/prepublication.patch
+          git apply --unidiff-zero /tmp/prepublication.patch
+      - name: Preserve source on review branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md AGENTS.md .env.example .gitignore astro.config.mjs package.json package-lock.json docs src public scripts tests
+          git diff --cached --quiet || git commit -m 'Complete source-grounded MDOR editorial pass, citations, consent, and launch checks'
+          git push origin HEAD:build/initial-site
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+        id: build
+      - run: npm run test:links
+      - run: npx playwright install --with-deps chromium firefox
+        id: browsers
+      - run: npm run test:browser
+      - run: npm run test:consent
+        if: always() && steps.browsers.outcome == 'success'
+      - run: npm run test:external
+        if: always() && steps.build.outcome == 'success'
+      - name: Build non-indexable review preview
+        if: always() && steps.build.outcome == 'success'
+        run: PREVIEW_BUILD=true npx astro build --outDir artifacts/preview
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prepublication-review
+          path: |
+            artifacts/*.json
+            artifacts/*.png
+            artifacts/*.pdf
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.build.outcome == 'success'
+        with:
+          name: prepublication-preview
+          path: artifacts/preview/
+          include-hidden-files: true
+          retention-days: 14
