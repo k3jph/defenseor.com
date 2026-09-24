@@ -1,0 +1,9 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Catalogue from '../../../components/Catalogue.astro';
+import { editions } from '../../../data/catalogue.mjs';
+---
+<Layout title="First-edition chapters" active="Chapters" image={editions['1e'].cover} imageAlt="First-edition handbook cover" description="Search the twenty first-edition chapters in their four original parts, with edition-specific authorship, page ranges, and citations.">
+  <div class="wrap page-intro"><p class="eyebrow">The collection · First edition · 2020</p><h1>First-edition chapters.</h1><p class="lead">The original collection has its own structure. Searches on this page stay within the first edition, with its chapter numbers, authors, and references.</p><a class="text-link" href="/chapters/">Explore the second edition <span aria-hidden="true">→</span></a></div>
+  <Catalogue edition="1e" />
+</Layout>

@@ -2,42 +2,55 @@
 
 The scholarly companion to *Handbook of Military and Defense Operations Research*, edited by Natalie M. Scala and James P. Howard, II.
 
+## Review candidate
+
+Development is on `build/initial-site`, draft PR #1. The approved publication-style design remains intact: cover-derived colors, numbered chapters and conspicuous bylines, contributor records, a reading room, and separate edition archives. This is not a CMNA reskin. Forty chapter records preserve their original URLs; twenty current-edition chapters have source-scoped original overviews. Both editions now have published DOI/page references and generated BibTeX/RIS chapter downloads.
+
+**Nothing in the prepublication pass publishes the site or changes DNS.** Start with [the editor review guide](docs/REVIEW.md), [the publication audit](docs/PUBLICATION-AUDIT.md), and [the launch/rollback runbook](docs/LAUNCH.md).
+
 ## Develop
 
-Use Node 22.12 or later (CI uses Node 24).
+Use Node 24 LTS (minimum 22.19) and the committed lockfile.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-The default development address is http://localhost:4321. Production output is static HTML in `dist/`, built with `npm run build`. The domain is configured as `https://defenseor.com` and `public/CNAME` names it, but this repository does **not** automatically deploy anything or change DNS. The initial implementation is on `build/initial-site`, for review before a production decision.
+`predev` and `prebuild` generate the optimized square portrait sizes, favicons, and site sharing image locally from the supplied assets. No image service or external fonts are required at runtime. The joint footer places Natalie's portrait first and James's canonical badge second, at equal dimensions. Copyright also names Natalie first.
 
-## Structure
-
-- **Chapters:** searchable second-edition contents and edition-specific pages.
-- **Contributors:** a combined index across the two editions with chapter bylines preserved.
-- **Reading room:** three original discussion pathways and print-friendly exercises.
-- **The book:** current bibliographic details, downloadable citations, and a separately maintained first-edition archive.
-
-Forty chapter records represent twenty chapters in each edition. Fifty-five contributor records connect the bylines without inventing professional biographies. The second edition credits forty-six distinct chapter authors. The website does not reproduce chapter texts or claim to provide their abstracts. New reading prompts, topic labels, and pathways are expressly identified as companion material. See `docs/SOURCES.md` for evidence and limitations.
-
-The design is editorial rather than an adaptation of the CMNA interface. The footer uses Natalie’s portrait first and James’s badge second, at equal square sizes. No remote fonts, analytics, advertising, embeds, or client-side framework are used. Search is a small progressive enhancement over complete static HTML.
-
-## Check
+## Verify
 
 ```sh
 npm test
 npm run build
 npm run test:links
-npx playwright install chromium
+npx playwright install --with-deps chromium firefox
 npm run test:browser
+npm run test:consent
+npm run test:external
 ```
 
-Browser checks create screenshots and a JSON result in `artifacts/`. GitHub Actions repeats these checks and retains the static build and browser-review artifacts. This is not a claim of exhaustive accessibility certification.
+Browser checks enumerate every output HTML file rather than a hand-maintained subset. Chromium runs the axe WCAG A/AA checks; both Chromium and Firefox exercise navigation, filters, downloads, keyboard focus, no-JavaScript browsing, reflow, and larger text. Chromium also exercises the real clipboard API and produces screenshots and print samples. The configured-consent fixture intercepts a synthetic tag, so it never sends real analytics requests. External-link checks distinguish successful visits, broken destinations, and provider access limits. See the generated JSON reports; do not equate an access-limited request or an unrun check with a pass.
 
-## Content and ownership
+## Preview without enabling indexing or analytics
 
-Edit publication records in `src/data/catalogue.mjs`; routes and indexes are derived from those records. Keep first- and second-edition entries separate. Preserve the original author order in each chapter. Do not extend a table-of-contents record into a purported chapter summary without reading an authorized source.
+```sh
+npm run prebuild
+PREVIEW_BUILD=true npx astro build --outDir artifacts/preview
+node scripts/serve.mjs artifacts/preview
+```
 
-Copyright © 2018–2026 Natalie M. Scala and James P. Howard, II for original companion material. Book, chapter, portrait, badge, and cover rights remain with their respective rights holders. This repository does not grant a blanket license for third-party assets.
+Open the printed localhost address. The preview emits noindex and forces the analytics ID blank. All content and downloads are static, and can also be served by another local HTTP server. Do not review with file:// paths: absolute asset/navigation URLs need an HTTP origin.
+
+## Privacy configuration
+
+`PUBLIC_GA_ID` is blank by default; `.env.example` documents it. This is a disabled configuration, not a dummy ID sent to Google. Cookie Settings accurately reports that state. An explicitly configured valid ID must receive a fresh affirmative choice before a tag loads; changing the ID changes the consent version. The host-only preference cookie is separate from optional analytics. Review privacy wording against the actual hosting and any later configuration before launching.
+
+## Publication
+
+The read-only verification workflow retains a non-indexable preview, production static output, browser/consent JSON reports, screenshots, and print samples. The separate production workflow has only a manual trigger. It requires an exact approved main-branch SHA, matching repository approval variable, typed confirmation, passing checks, and the protected deployment environment. It has no push-triggered publishing. Account settings, custom domain, DNS, redirects, HTTPS and a live-origin acceptance check remain explicit launch-stage work. Follow `docs/LAUNCH.md`; do not use a change of repository visibility as an unapproved workaround.
+
+## Sources and rights
+
+See [SOURCES.md](docs/SOURCES.md), [PUBLICATION-AUDIT.md](docs/PUBLICATION-AUDIT.md), and [DESIGN.md](docs/DESIGN.md). Original chapter overviews and exercises are distinct from chapter authors' prose. No published chapter text, raw private proof, solution set, or author contact directory is included. Existing supplied assets retain their respective rights. Bibliographic source disagreements remain visible for coeditor review.

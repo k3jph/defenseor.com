@@ -1,7 +1,9 @@
 ---
 import '../styles/site.css';
+import CookieConsent from '../components/CookieConsent.astro';
+import { previewBuild } from '../data/site-settings.mjs';
 import { title as bookTitle, editors } from '../data/catalogue.mjs';
-const { title = bookTitle, description = 'Explore the chapters, contributors, and reading pathways of the Handbook of Military and Defense Operations Research.', active = '', noindex = false, schema } = Astro.props;
+const { title = bookTitle, description = 'Explore the chapters, contributors, and reading pathways of the Handbook of Military and Defense Operations Research.', active = '', noindex = false, image = '/assets/social/companion.png', imageAlt = 'Handbook of Military and Defense Operations Research companion', schema } = Astro.props;
 const canonical = new URL(Astro.url.pathname === '/404/' ? '/404.html' : Astro.url.pathname, Astro.site);
 const nav = [['Chapters', '/chapters/'], ['Contributors', '/contributors/'], ['Reading room', '/reading-room/'], ['The book', '/book/']];
 ---
@@ -14,12 +16,17 @@ const nav = [['Chapters', '/chapters/'], ['Contributors', '/contributors/'], ['R
   <meta name="description" content={description} />
   <meta name="theme-color" content="#272443" />
   <link rel="canonical" href={canonical} />
-  {noindex && <meta name="robots" content="noindex,follow" />}
+  {(noindex || previewBuild) && <meta name="robots" content="noindex,follow" />}
   <meta property="og:type" content="website" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:url" content={canonical} />
-  <meta property="og:image" content={new URL('/assets/covers/second-edition.jpg', Astro.site)} />
+  <meta property="og:image" content={new URL(image, Astro.site)} />
+  <meta property="og:image:alt" content={imageAlt} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />}
 </head>
 <body>
@@ -41,9 +48,10 @@ const nav = [['Chapters', '/chapters/'], ['Contributors', '/contributors/'], ['R
     </div>
     <div class="wrap footer-bottom">
       <p>Copyright © 2018–{new Date().getFullYear()} Natalie M. Scala and James P. Howard, II.</p>
-      <nav aria-label="Site notices"><a href="/notices/#privacy">Privacy Notice</a><a href="/notices/#cookies">Cookie Settings</a><a href="/notices/#terms">Terms of Use</a><a href="/notices/#copyright">Copyright</a></nav>
+      <nav aria-label="Site notices"><a href="/about/">About</a><a href="/contact/">Contact &amp; corrections</a><a href="/notices/#privacy">Privacy Notice</a><a href="/notices/#cookies" data-cookie-preferences>Cookie Settings</a><a href="/notices/#terms">Terms of Use</a><a href="/notices/#copyright">Copyright</a></nav>
     </div>
   </footer>
+  <CookieConsent />
   <script src="../scripts/site.js"></script>
 </body>
 </html>

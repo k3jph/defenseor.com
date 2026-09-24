@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { editors, personSlug } from '../data/catalogue.mjs';
+---
+<Layout title="About this companion" description="How to use the handbook companion, meet its two editors, and distinguish published chapters from original website reading material.">
+  <div class="wrap page-intro"><p class="eyebrow">About the companion</p><h1>A collection with more than one entrance.</h1><p class="lead">Find a chapter, follow a contributor, or begin with a question. The handbook remains the place for the full argument; this site helps readers find their way to it.</p></div>
+  <div class="wrap prose long-copy">
+    <h2>Using the collection</h2>
+    <p><cite>Handbook of Military and Defense Operations Research</cite> brings together contributions with different methods, settings, and practical concerns. A reader looking for a particular analytical tool may enter the collection in a different place from someone working through a planning problem or preparing a course. The chapter catalogue preserves the book’s published organization, while the contributor index and reading room offer other routes through it. Students, instructors, and practitioners can use those routes without needing to read the volume in a single sequence. Publication and purchasing links lead to the publisher; this website does not sell access to the book.</p>
+    <h2>The editors</h2>
+    <p>Natalie M. Scala and James P. Howard, II co-edited both editions of the handbook and share this companion website. Editing the collection and authoring an individual chapter are different roles. Each chapter page therefore gives its authors a prominent byline, while the contributor records connect a person’s work across editions. The editors’ individual websites provide their professional biographies and other work.</p>
+    <div class="about-editors">{editors.map(e => <p><strong><a href={`/contributors/${personSlug(e.name)}/`}>{e.name}</a></strong><br /><a href={e.url}>{e.display}’s website</a></p>)}</div>
+    <h2 id="editorial">Chapters and companion material</h2>
+    <p>Chapter titles, author credits, page ranges, and references describe the published contributions. The short second-edition overviews are original companion descriptions of each chapter’s scope, not publisher abstracts or replacements for the chapter text. The reading room adds thematic introductions, chapter connections, questions, and exercises written for this website. These additions are labeled as companion material so that a reader can distinguish them from the authors’ work. A chapter’s inclusion in a reading pathway does not imply that its authors wrote or endorsed the accompanying exercise.</p>
+    <p>The first and second editions have separate chapter records and citations. Some contributors appear in both, and some titles or author orders differ between editions. The website uses published chapter-level records for the bibliographic details and keeps earlier contents-list titles searchable where they differ. Topic labels are an editorial index rather than author-supplied keywords. A reference identifies a particular contribution in a particular edition; it should not silently change when a reader moves between the two collections.</p>
+    <h2>Corrections and contributions</h2>
+    <p>A useful reference needs a straightforward way to correct mistakes. Please report a problem with a chapter record, an attribution, a link, or an accessibility feature through the <a href="/contact/">contact and corrections page</a>. Proposed teaching resources or other additions are welcome for consideration, but sending material does not automatically make it public. Permission and attribution must be established before material supplied by someone else is added. Book text, figures, and instructor materials are not made freely reusable simply by being associated with the companion.</p>
+  </div>
+</Layout>

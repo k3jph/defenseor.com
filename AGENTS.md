@@ -12,8 +12,8 @@ This is an authored handbook, not a monograph. Preserve the publication-style de
 
 ## Evidence
 
-Read `docs/SOURCES.md`. Metadata follows the publisher for the second edition and Natalie’s posted contents for the first. Topic tags and reading pathways are editorial additions, clearly labeled. Do not merge chapter numbering or bylines between editions. No unverified chapter DOI, pagination, full text, claims of peer review, or invented resources. A missing source is a gap to record, not fill with plausible detail.
+Read `docs/SOURCES.md`. Metadata follows the documented source precedence in `docs/PUBLICATION-AUDIT.md`; chapter identifiers and pages have explicit published deposits. Preserve supported subtitles omitted by the deposit. Topic tags and reading pathways are editorial additions, clearly labeled. Do not merge chapter numbering or bylines between editions. No unverified chapter DOI, pagination, full text, claims of peer review, or invented resources. A missing source is a gap to record, not fill with plausible detail.
 
 ## Engineering
 
-Static Astro, minimal JavaScript, local assets, no third-party tracking or embeds. Preserve full no-JavaScript navigation and visible focus states. Verify metadata tests, build, internal links, and browser checks. Keep dependency versions locked. Record changes and limits; never report a passed test that has not run. Bootstrap import workflows are temporary and must not remain after the initial build.
+Static Astro, minimal JavaScript, local assets, no third-party embeds. Analytics stays unconfigured by default and may load only after valid affirmative consent for the current configuration. Preview builds force it off. Preserve full no-JavaScript navigation and visible focus states. Verify metadata tests, build, internal links, and browser and consent checks. Respect the manual release approval gate in `docs/LAUNCH.md`. Keep dependency versions locked. Record changes and limits; never report a passed test that has not run. Bootstrap import workflows are temporary and must not remain after the initial build.

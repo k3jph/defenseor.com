@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { bibtex, ris, bookReference } from '../src/data/citations.mjs';
 import { chapters, currentChapters, currentContributors, contributors, editions, editors, pathways, personSlug, bookCitation } from '../src/data/catalogue.mjs';
 
 test('two complete, independently numbered editions', () => {
@@ -49,10 +49,10 @@ test('edition metadata and citation files retain editor rather than author credi
     assert.equal((10 - sum % 10) % 10, digits[12]);
     assert.ok(bookCitation(key).includes(String(edition.year)));
     const stem = key === '2e' ? 'second-edition' : 'first-edition';
-    const bib = readFileSync(new URL(`../public/citations/${stem}.bib`, import.meta.url), 'utf8');
-    const ris = readFileSync(new URL(`../public/citations/${stem}.ris`, import.meta.url), 'utf8');
+    const bib = bibtex(bookReference(key));
+    const risText = ris(bookReference(key));
     assert.match(bib, /editor\s*=/);
     assert.ok(bib.includes(edition.isbn));
-    assert.match(ris, /A2  - Scala/);
+    assert.match(risText, /A2  - Scala/);
   }
 });

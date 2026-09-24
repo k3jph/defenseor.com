@@ -1,3 +1,4 @@
+document.querySelectorAll('[data-enhanced]').forEach(el => { el.hidden = false; });
 // Progressive enhancement only: all publication records and links exist in HTML.
 const normalize = value => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 for (const root of document.querySelectorAll('[data-filter]')) {
@@ -52,3 +53,16 @@ for (const button of document.querySelectorAll('[data-copy]')) button.addEventLi
     message.textContent = 'Select the citation above to copy it. Clipboard access is unavailable in this browser.';
   }
 });
+
+// A contextual mail link does not collect or submit anything on the website.
+const correction = new URLSearchParams(location.search).get('chapter');
+if (correction && /^(1e|2e)-([0-1][0-9]|20)$/.test(correction)) {
+  const link = document.querySelector('[data-correction-mail]');
+  const context = document.querySelector('[data-correction-context]');
+  if (link && context) {
+    const subject = `DefenseOR correction: ${correction}`;
+    link.href = `mailto:jh@jameshoward.us?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Chapter record: ' + correction + '\nEdition / page / URL:\nProposed correction:\nSupporting source:\n')}`;
+    context.textContent = `Your message will identify chapter record ${correction}. Nothing is sent until you send the email.`;
+    context.hidden = false;
+  }
+}

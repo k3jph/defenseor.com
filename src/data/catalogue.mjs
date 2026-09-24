@@ -1,3 +1,4 @@
+import { publicationRecords } from './publication-records.mjs';
 // Publication metadata is transcribed from the sources below. Reading prompts,
 // topic tags, and pathways are companion-site editorial material, not abstracts.
 export const title = 'Handbook of Military and Defense Operations Research';
@@ -10,8 +11,8 @@ export const sources = {
   natalie: 'https://www.drnataliescala.com/books',
 };
 export const editions = {
-  '2e': { label: 'Second edition', year: 2024, isbn: '9781032497488', cover: '/assets/covers/second-edition.jpg', source: sources.second, parts: ['Approaches', 'Applications', 'Soft Skills and Perspectives'] },
-  '1e': { label: 'First edition', year: 2020, isbn: '9781138607330', cover: '/assets/covers/first-edition.webp', source: sources.first, parts: ['Approaches', 'Soft Skills and Client Relations', 'Applications', 'Perspectives'] },
+  '2e': { label: 'Second edition', year: 2024, doi: '10.1201/9781003396307', isbn: '9781032497488', cover: '/assets/covers/second-edition.jpg', source: sources.second, parts: ['Approaches', 'Applications', 'Soft Skills and Perspectives'] },
+  '1e': { label: 'First edition', year: 2020, doi: '10.1201/9780429467219', isbn: '9781138607330', cover: '/assets/covers/first-edition.webp', source: sources.first, parts: ['Approaches', 'Soft Skills and Client Relations', 'Applications', 'Perspectives'] },
 };
 export const slugify = value => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const aliases = {
@@ -71,10 +72,17 @@ const make = (rows, edition) => rows.map(([number, name, authors, part, topics])
   slug: slugify(name),
   url: `/chapters/${edition}/${slugify(name)}/`,
 }));
-export const chapters = [...make(second, '2e'), ...make(first, '1e')];
+// Keep the original routes stable when a deposited chapter title differs from a catalogue title.
+export const chapters = [...make(second, '2e'), ...make(first, '1e')].map(c => ({
+  ...c, catalogueTitle: c.title, ...publicationRecords[c.id],
+  depositedTitle: publicationRecords[c.id].title,
+  // These published contents/proof subtitles are omitted from the deposit.
+  title: ['2e-02', '2e-15'].includes(c.id) ? c.title : publicationRecords[c.id].title,
+}));
+export const catalogueUrl = edition => edition === '1e' ? '/chapters/1e/' : '/chapters/';
 export const currentChapters = chapters.filter(c => c.edition === '2e');
 export const editors = [
-  { name: 'Natalie M. Scala', display: 'Natalie Scala', url: 'https://www.drnataliescala.com/', image: '/assets/identity/natalie-scala.jpg' },
+  { name: 'Natalie M. Scala', display: 'Natalie Scala', url: 'https://www.drnataliescala.com/', image: '/assets/identity/natalie-scala-192.webp' },
   { name: 'James P. Howard, II', display: 'James Howard', url: 'https://jameshoward.us/', image: '/assets/identity/jh-badge-1x1.svg' },
 ];
 const people = new Map();

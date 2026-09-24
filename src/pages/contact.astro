@@ -1,0 +1,16 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { contactEmail } from '../data/site-settings.mjs';
+---
+<Layout title="Contact and corrections" description="Report a chapter-record error, broken link, or accessibility problem, or propose a companion resource for the handbook.">
+  <div class="wrap page-intro"><p class="eyebrow">Contact & corrections</p><h1>Help keep the companion useful.</h1><p class="lead">A wrong byline, an unhelpful link, or a page that does not work with your browser is worth reporting. Include enough detail for us to find the problem.</p></div>
+  <div class="wrap prose long-copy">
+    <h2>Report a correction</h2>
+    <p>Email <a data-correction-mail href={`mailto:${contactEmail}?subject=DefenseOR%20correction`}>{contactEmail}</a> for website corrections and technical questions. For a chapter record, include the edition, chapter title or number, and the page or web address involved. Tell us what appears to be wrong and, where possible, identify a source supporting the proposed correction. For a problem in the printed book, include the printing or format as well as the page number. Reports are reviewed before they become changes to the website or an erratum; an email is not automatically published.</p>
+    <p data-correction-context class="source-note" hidden></p>
+    <h2>Access and teaching material</h2>
+    <p>For an accessibility problem, describe the task you were trying to complete, what happened, and the browser or assistive technology involved when that information is available. There is no need to send personal records or operational data. Suggestions for companion teaching material should identify the intended audience, relevant chapter, source, and permission to share it. Please do not send restricted information, student records, or instructor-only solutions. Questions about purchasing, institutional access, or a publisher account should go to the publisher through the links on <a href="/book/">the book page</a>.</p>
+    <h2>The two editors</h2>
+    <p>This is a joint companion of Natalie M. Scala and James P. Howard, II. Their individual websites provide additional professional contact routes: <a href="https://www.drnataliescala.com/">Natalie Scala</a> and <a href="https://jameshoward.us/">James Howard</a>. The email above provides a direct route for maintaining the website; it does not replace the authorship of the individual chapters or the publisher’s responsibility for access to the volume.</p>
+  </div>
+</Layout>

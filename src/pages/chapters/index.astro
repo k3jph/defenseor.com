@@ -1,15 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import ChapterList from '../../components/ChapterList.astro';
-import { currentChapters, editions, sources } from '../../data/catalogue.mjs';
+import Catalogue from '../../components/Catalogue.astro';
 ---
-<Layout title="Explore the chapters" active="Chapters">
-  <div class="wrap page-intro"><p class="eyebrow">The collection · Second edition</p><h1>Explore the chapters.</h1><p class="lead">Twenty authored contributions, organized in the handbook’s three parts. Search by chapter, author, or topic, or follow the contents in their published order.</p><a class="text-link" href="/book/first-edition/">Looking for the first edition? <span aria-hidden="true">→</span></a></div>
-  <section class="wrap catalogue" data-filter data-noun="chapters" aria-label="Chapter catalogue">
-    <form class="filter-bar" role="search"><div class="search-field"><label for="chapter-search">Find a chapter</label><input id="chapter-search" name="q" type="search" placeholder="Try “simulation”, “Hill”, or “risk”" autocomplete="off" /></div><div><label for="part">Part of the book</label><select id="part" name="part"><option value="">All three parts</option>{editions['2e'].parts.map((name, i) => <option value={i}>{name}</option>)}</select></div><button type="submit" class="button">Search</button><button type="button" data-clear class="text-button">Clear</button></form>
-    <p class="result-count" data-count role="status" aria-live="polite">20 chapters</p>
-    <p data-empty hidden class="empty-state">No chapters match that search. Try an author’s surname or clear the part filter.</p>
-    {editions['2e'].parts.map((name, i) => <section data-group class="part-section"><h2><span class="eyebrow">Part {['I', 'II', 'III'][i]}</span>{name}</h2><ChapterList chapters={currentChapters.filter(c => c.part === i)} /></section>)}
-    <p class="source-note">Titles, bylines, chapter order, and part divisions follow the <a href={sources.second}>publisher’s second-edition contents</a>. Search topics are companion-site indexing, not author-supplied keywords.</p>
-  </section>
+<Layout title="Explore the chapters" active="Chapters" description="Find the twenty second-edition chapters by title, contributor, topic, or part, with chapter overviews and downloadable references.">
+  <div class="wrap page-intro"><p class="eyebrow">The collection · Second edition</p><h1>Explore the chapters.</h1><p class="lead">Twenty authored contributions, organized in the handbook’s three parts. Search by chapter, author, or topic, or follow the contents in their published order.</p><a class="text-link" href="/chapters/1e/">Looking for the first edition? <span aria-hidden="true">→</span></a></div>
+  <Catalogue edition="2e" />
 </Layout>
