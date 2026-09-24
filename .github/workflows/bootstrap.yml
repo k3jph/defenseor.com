@@ -16,22 +16,24 @@ jobs:
         with:
           node-version: '24'
       - run: npm install --package-lock-only --ignore-scripts
-      - name: Fetch supplied identity and existing author-site publication assets
+      - name: Fetch identity and publication assets
         run: |
           mkdir -p public/assets/identity public/assets/covers
           curl --fail --location --retry 3 'https://jameshoward.us/assets/img/identity/jh-badge-1x1.svg' -o public/assets/identity/jh-badge-1x1.svg
           curl --fail --location --retry 3 'https://images.squarespace-cdn.com/content/v1/5a6b6f31b1ffb6024ea638b6/1520103099816-SF1507C9KYTHUYUJ2311/NScala.jpg' -o public/assets/identity/natalie-scala.jpg
-          curl --fail --location --retry 3 'https://covers.vitalsource.com/vbid/9781040047033/width/640?style=preview' -o public/assets/covers/second-edition.jpg
           curl --fail --location --retry 3 'https://jameshoward.us/assets/img/mdor-cover.webp' -o public/assets/covers/first-edition.webp
+          curl --fail --location --retry 3 'https://images.booksense.com/images/488/497/9781032497488.jpg' -o public/assets/covers/second-edition.jpg
           file public/assets/identity/* public/assets/covers/*
-      - name: Save the initial lockfile and assets on the build branch only
+      - name: Save available initial assets on build branch
+        if: always()
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add package-lock.json public/assets
-          git diff --cached --quiet || git commit -m 'Lock initial dependencies and preserve supplied publication assets'
+          git diff --cached --quiet || git commit -m 'Lock dependencies and preserve available supplied publication assets'
           git push origin HEAD:build/initial-site
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: bootstrap-assets
           path: |
