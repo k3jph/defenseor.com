@@ -1,0 +1,45 @@
+name: Import and verify initial companion
+on:
+  push:
+    branches: [build/initial-site]
+    paths: [.github/workflows/import.yml, .bootstrap/**]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: build/initial-site
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Validate source transfer before extracting
+        run: |
+          cat .bootstrap/source.0 .bootstrap/source.1 .bootstrap/source.2 .bootstrap/source.3 > /tmp/source.tar.gz
+          echo '3ce184ed9b16000e78f69364f9b78eb38783ef007aa4e6a3aa579e292341d6ac  /tmp/source.tar.gz' | sha256sum -c -
+          tar -xzf /tmp/source.tar.gz
+      - name: Persist source to build branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md AGENTS.md docs src public scripts tests astro.config.mjs package.json .gitignore
+          git diff --cached --quiet || git commit -m 'Implement editorial MDOR companion with edition-aware records and joint identity'
+          git push origin HEAD:build/initial-site
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npm run test:links
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: import-review
+          path: |
+            .bootstrap/
+            artifacts/
+            dist/
+          include-hidden-files: true
+          retention-days: 7
