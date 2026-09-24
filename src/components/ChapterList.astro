@@ -1,0 +1,11 @@
+---
+import { personSlug } from '../data/catalogue.mjs';
+const { chapters, compact = false } = Astro.props;
+---
+<ol class:list={['chapter-list', { compact }]}>
+  {chapters.map(c => <li data-search={`${c.number} ${c.title} ${c.authors.join(' ')} ${c.topics.join(' ')}`} data-part={c.part}>
+    <span class="chapter-number" aria-label={`Chapter ${c.number}`}>{String(c.number).padStart(2, '0')}</span>
+    <div><h3><a href={c.url}>{c.title}</a></h3><p class="byline">{c.authors.map((name, index) => <>{index > 0 && '; '}<a href={`/contributors/${personSlug(name)}/`}>{name}</a></>)}</p></div>
+    <a class="row-arrow" href={c.url} aria-label={`View chapter ${c.number}: ${c.title}`}>↗</a>
+  </li>)}
+</ol>
