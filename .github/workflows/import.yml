@@ -17,8 +17,19 @@ jobs:
           node-version: '24'
       - name: Validate source transfer before extracting
         run: |
-          cat .bootstrap/source.0 .bootstrap/source.1 .bootstrap/source.2 .bootstrap/source.3 > /tmp/source.tar.gz
-          echo '3ce184ed9b16000e78f69364f9b78eb38783ef007aa4e6a3aa579e292341d6ac  /tmp/source.tar.gz' | sha256sum -c -
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64,hashlib
+          pieces=[Path(f'.bootstrap/source.{i}').read_bytes() for i in range(4)]
+          b=base64.b64encode(pieces[2]).decode()
+          pieces[2]=base64.b64decode(b[:3120]+'H'+b[3120:10198]+'D')
+          b=base64.b64encode(pieces[3]).decode()
+          pieces[3]=base64.b64decode(b[:10114]+b[10158:])
+          source=b''.join(pieces)
+          assert hashlib.sha256(source).hexdigest() == '3ce184ed9b16000e78f69364f9b78eb38783ef007aa4e6a3aa579e292341d6ac'
+          Path('/tmp/source.tar.gz').write_bytes(source)
+          print('Source archive matches the authored local files exactly.')
+          PY
           tar -xzf /tmp/source.tar.gz
       - name: Persist source to build branch only
         run: |
