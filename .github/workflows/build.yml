@@ -7,11 +7,15 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: verify-${{ github.ref }}
+  group: verify-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PUBLIC_GA_ID: ''
+      PREVIEW_BUILD: 'false'
     steps:
       - uses: actions/checkout@v6
         with:
@@ -24,16 +28,32 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run test:links
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium firefox
       - run: npm run test:browser
-      - uses: actions/upload-artifact@v4
+      - run: npm run test:consent
+      - name: Build the non-indexable review version
+        run: npx astro build --outDir artifacts/preview
+        env:
+          PREVIEW_BUILD: 'true'
+      - name: Save review evidence
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: browser-review
-          path: artifacts/
-          retention-days: 14
+          name: publication-review
+          path: |
+            artifacts/*.json
+            artifacts/*.png
+            artifacts/*.pdf
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-review-preview
+          path: artifacts/preview/
+          include-hidden-files: true
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         with:
           name: static-site
           path: dist/
-          retention-days: 14
+          include-hidden-files: true
+          retention-days: 30

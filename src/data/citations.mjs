@@ -1,6 +1,6 @@
 import { chapters, editions, title, publisher, editors } from './catalogue.mjs';
 
-export const chapterCitation = c => `${c.authors.join('; ')}. (${editions[c.edition].year}). ${c.title}. In Natalie M. Scala & James P. Howard, II (Eds.), ${title} (${c.edition === '2e' ? '2nd ed., ' : ''}pp. ${c.pages.replace('-', '–')}). ${publisher}. https://doi.org/${c.doi}`;
+export const chapterCitation = c => `${c.authors.join('; ')}. (${editions[c.edition].year}). ${c.title}${/[.!?]$/.test(c.title) ? '' : '.'} In Natalie M. Scala & James P. Howard, II (Eds.), ${title} (${c.edition === '2e' ? '2nd ed., ' : ''}pp. ${c.pages.replace('-', '–')}). ${publisher}. https://doi.org/${c.doi}`;
 export const bookReference = id => ({ id: id === '2e' ? 'second-edition' : 'first-edition', edition: id, title, doi: editions[id].doi });
 export const citationEntries = [...chapters, bookReference('2e'), bookReference('1e')];
 const bibText = text => text.replace(/([&%_$#{}])/g, '\\$1');

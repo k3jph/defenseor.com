@@ -1,0 +1,4 @@
+/* Keep the cover-derived muted numerals readable on the paper surface. */
+.chapter-ordinal,.part-numeral{color:#938967}
+/* A light focus indicator remains visible inside the dark editorial feature. */
+.feature-band :focus-visible{outline-color:var(--yellow)}

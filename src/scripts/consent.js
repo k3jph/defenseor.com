@@ -74,6 +74,14 @@ if (root) {
     write('accepted'); close(); render(); enable();
   }));
   root.querySelector('[data-cookie-close]').addEventListener('click', close);
+  dialog.addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const controls = [...dialog.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex="0"]')].filter(el => el.getClientRects().length);
+    if (!controls.length) { event.preventDefault(); dialog.focus(); return; }
+    const first = controls[0], last = controls[controls.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !controls.includes(document.activeElement))) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && (document.activeElement === last || !controls.includes(document.activeElement))) { event.preventDefault(); first.focus(); }
+  });
   dialog.addEventListener('close', () => { if (opener?.isConnected) opener.focus(); });
   document.querySelectorAll('[data-cookie-preferences]').forEach(control => control.addEventListener('click', event => {
     event.preventDefault(); opener = control; render(); dialog.showModal();
