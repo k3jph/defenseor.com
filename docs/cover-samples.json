@@ -1,0 +1,22 @@
+{
+  "first-edition.webp": {
+    "size": [
+      354,
+      499
+    ],
+    "samples": {
+      "dark field": "#110c3b",
+      "pale yellow band": "#ffed98"
+    }
+  },
+  "second-edition.jpg": {
+    "size": [
+      280,
+      400
+    ],
+    "samples": {
+      "dark field": "#110b39",
+      "pale yellow band": "#feec96"
+    }
+  }
+}

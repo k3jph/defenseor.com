@@ -1,0 +1,58 @@
+---
+import '../styles/site.css';
+import '../styles/accessibility.css';
+import CookieConsent from '../components/CookieConsent.astro';
+import { previewBuild } from '../data/site-settings.mjs';
+import { title as bookTitle, editors } from '../data/catalogue.mjs';
+const { title = bookTitle, description = 'Explore the chapters, contributors, and reading pathways of the Handbook of Military and Defense Operations Research.', active = '', noindex = false, image = '/assets/social/companion.png', imageAlt = 'Handbook of Military and Defense Operations Research companion', schema } = Astro.props;
+const canonical = new URL(Astro.url.pathname === '/404/' ? '/404.html' : Astro.url.pathname, Astro.site);
+const nav = [['Chapters', '/chapters/'], ['Contributors', '/contributors/'], ['Reading room', '/reading-room/'], ['The book', '/book/']];
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{`${title} | DefenseOR`}</title>
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#272443" />
+  <link rel="canonical" href={canonical} />
+  {(noindex || previewBuild) && <meta name="robots" content="noindex,follow" />}
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={new URL(image, Astro.site)} />
+  <meta property="og:image:alt" content={imageAlt} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  {schema && <script type="application/ld+json" is:inline set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />}
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header wrap">
+    <a class="wordmark" href="/" aria-label="DefenseOR home"><span class="monogram">MDOR<span class="mark-dot">.</span></span><span class="wordmark-note">The handbook<br />companion</span></a>
+    <nav aria-label="Main navigation">{nav.map(([label, url]) => <a href={url} aria-current={active === label ? 'page' : undefined}>{label}</a>)}</nav>
+  </header>
+  <main id="main" tabindex="-1"><slot /></main>
+  <footer class="site-footer">
+    <div class="wrap footer-top">
+      <div class="joint-brand">
+        <div class="joint-images">
+          {editors.map((editor, i) => <a href={editor.url} aria-label={`${editor.display}'s website`}><img src={editor.image} alt="" width="64" height="64" loading="lazy" class={i === 0 ? 'portrait' : 'badge'} /></a>)}
+        </div>
+        <div class="joint-text"><a class="domain" href="/">defenseor.com</a><p>A website of <a href={editors[0].url}>Natalie Scala</a><br class="footer-break" /> and <a href={editors[1].url}>James Howard</a></p></div>
+      </div>
+      <p class="footer-description">A companion to <cite>{bookTitle}</cite>.<br />Individual contributions. Shared inquiry.</p>
+    </div>
+    <div class="wrap footer-bottom">
+      <p>Copyright © 2018–{new Date().getFullYear()} Natalie M. Scala and James P. Howard, II.</p>
+      <nav aria-label="Site notices"><a href="/about/">About</a><a href="/contact/">Contact &amp; corrections</a><a href="/notices/#privacy">Privacy Notice</a><a href="/notices/#cookies" data-cookie-preferences>Cookie Settings</a><a href="/notices/#terms">Terms of Use</a><a href="/notices/#copyright">Copyright</a></nav>
+    </div>
+  </footer>
+  <CookieConsent />
+  <script src="../scripts/site.js"></script>
+</body>
+</html>

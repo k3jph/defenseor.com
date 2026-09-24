@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+.env
+.env.*
+artifacts/
+
+# Rebuilt from the supplied local originals; no network required.
+public/assets/identity/natalie-scala-*.webp
+public/assets/social/
+public/favicon.svg
+public/favicon-32.png
+public/apple-touch-icon.png
+!/.env.example

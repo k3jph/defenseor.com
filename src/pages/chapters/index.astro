@@ -1,0 +1,8 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Catalogue from '../../components/Catalogue.astro';
+---
+<Layout title="Explore the chapters" active="Chapters" description="Find the twenty second-edition chapters by title, contributor, topic, or part, with chapter overviews and downloadable references.">
+  <div class="wrap page-intro"><p class="eyebrow">The collection · Second edition</p><h1>Explore the chapters.</h1><p class="lead">Twenty authored contributions, organized in the handbook’s three parts. Search by chapter, author, or topic, or follow the contents in their published order.</p><a class="text-link" href="/chapters/1e/">Looking for the first edition? <span aria-hidden="true">→</span></a></div>
+  <Catalogue edition="2e" />
+</Layout>

@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ChapterList from '../components/ChapterList.astro';
+import { title, currentChapters, currentContributors, editions, editors, partNotes, pathways } from '../data/catalogue.mjs';
+const feature = currentChapters.find(c => c.number === 19);
+---
+<Layout>
+  <div class="wrap hero">
+    <div class="hero-copy">
+      <p class="eyebrow">An edited collection · Second edition, 2024</p>
+      <h1><span class="title-prelude">Handbook of</span>Military &amp; Defense<br /><em>Operations Research</em></h1>
+      <p class="editor-credit">Edited by <a href="/contributors/natalie-m-scala/">Natalie M. Scala</a><br />and <a href="/contributors/james-p-howard-ii/">James P. Howard, II</a></p>
+      <p class="hero-intro">The methods are only part of the work. Explore the approaches, applications, and professional experience brought together by the handbook’s chapter authors.</p>
+      <div class="actions"><a class="button primary" href="/chapters/">Explore the chapters <span aria-hidden="true">→</span></a><a class="text-link" href="/book/">About the handbook</a></div>
+    </div>
+    <figure class="cover-stage">
+      <div class="cover-corner top">THE COLLECTION</div>
+      <img class="hero-cover" src={editions['2e'].cover} alt="Cover of Handbook of Military and Defense Operations Research, second edition" width="640" height="960" fetchpriority="high" />
+      <figcaption><span>Chapman &amp; Hall/CRC</span><span>Second edition</span></figcaption>
+    </figure>
+  </div>
+  <section class="wrap collection-overview" aria-labelledby="collection-title">
+    <div class="section-heading"><div><p class="eyebrow">Inside the collection</p><h2 id="collection-title">Three ways into the work.</h2></div><p class="small">20 chapters <span aria-hidden="true">/</span> {currentContributors.length} chapter authors</p></div>
+    <div class="parts-grid">{editions['2e'].parts.map((part, index) => <article class="part-panel"><span class="part-numeral">{['I', 'II', 'III'][index]}</span><p class="eyebrow">Part {['I', 'II', 'III'][index]} · {currentChapters.filter(c => c.part === index).length} chapters</p><h3><a href={`/chapters/?part=${index}`}>{part}</a></h3><p>{partNotes[index]}</p><a class="text-link" href={`/chapters/?part=${index}`}>Browse this part <span aria-hidden="true">→</span></a></article>)}</div>
+  </section>
+  <section class="feature-band" aria-labelledby="feature-title"><div class="wrap feature-grid"><div><p class="eyebrow">A question worth starting with</p><p class="feature-number">19</p></div><div><h2 id="feature-title"><a href={feature.url}>Why Won’t They<br /><em>Use Our Model?</em></a></h2><p class="feature-byline">Wilson L. Price and Walt DeGrange</p><p>A model’s place in an organization deserves attention alongside its mathematics. Start with this contribution, then follow the authors and related reading through the collection.</p><a class="text-link light" href={feature.url}>Meet the chapter <span aria-hidden="true">→</span></a></div></div></section>
+  <section class="wrap reading-preview" aria-labelledby="reading-title"><div class="section-heading"><div><p class="eyebrow">The reading room</p><h2 id="reading-title">Bring a question to the book.</h2></div><a class="text-link" href="/reading-room/">All reading notes <span aria-hidden="true">→</span></a></div><div class="reading-grid"><div class="prose"><p>An edited volume need not be read from cover to cover. These companion notes suggest a few routes through the chapter topics, with questions to carry into the reading and small exercises to bring back from it. They are starting points for your own work, not substitutes for the authors’ contributions.</p></div><ol class="pathway-list">{pathways.map((p, i) => <li><span class="small">0{i + 1}</span><div><p class="eyebrow">{p.label}</p><h3><a href={`/reading-room/${p.slug}/`}>{p.title} <span aria-hidden="true">↗</span></a></h3></div></li>)}</ol></div></section>
+  <section class="wrap people-strip"><p class="eyebrow">An authored collection</p><h2>Start with the people.</h2><p>Find a contributor’s chapters in either edition. Bylines stay attached to the work, and the earlier edition remains a separate record.</p><a class="text-link" href="/contributors/">Explore the contributor index <span aria-hidden="true">→</span></a></section>
+</Layout>

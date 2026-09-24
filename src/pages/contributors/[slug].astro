@@ -1,0 +1,11 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ChapterList from '../../components/ChapterList.astro';
+import { contributors, editions } from '../../data/catalogue.mjs';
+export function getStaticPaths() { return contributors.map(person => ({ params: { slug: person.slug }, props: { person } })); }
+const { person } = Astro.props;
+---
+<Layout title={person.name} active="Contributors" image={person.chapters.some(c => c.edition === '2e') ? editions['2e'].cover : editions['1e'].cover} description={`Contributions by ${person.name} to the Handbook of Military and Defense Operations Research.`}>
+  <div class="wrap page-intro"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/contributors/">Contributors</a><span aria-hidden="true">/</span><span>{person.name}</span></nav><p class="eyebrow">{person.editor ? 'Editor & contributor' : 'Chapter author'}</p><h1>{person.name}</h1>{person.editor ? <p class="lead">Co-editor of the first and second editions of the handbook. Chapter contributions are listed below in their respective editions.</p> : <p class="lead">Contributions to <cite>Handbook of Military and Defense Operations Research</cite>, organized by edition.</p>}{person.editor && <a class="text-link" href={person.editor.url}>Visit {person.editor.display}’s website <span aria-hidden="true">↗</span></a>}</div>
+  <div class="wrap contributor-record">{Object.entries(editions).map(([id, edition]) => person.chapters.some(c => c.edition === id) && <section class="part-section"><h2><span class="eyebrow">{edition.year}{id === '1e' ? ' · Archive' : ''}</span>{edition.label}</h2><ChapterList chapters={person.chapters.filter(c => c.edition === id)} /></section>)}<p class="source-note">Bylines are preserved on the individual chapter records. A contribution appearing in both editions is listed once under each edition, not represented as two unrelated publications. <a href="/about/#editorial">About the contributor records.</a></p></div>
+</Layout>

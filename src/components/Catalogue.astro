@@ -1,0 +1,19 @@
+---
+import ChapterList from './ChapterList.astro';
+import { chapters, editions, catalogueUrl } from '../data/catalogue.mjs';
+const { edition: id = '2e' } = Astro.props;
+const edition = editions[id];
+const records = chapters.filter(c => c.edition === id);
+---
+<section class="wrap catalogue" data-filter data-noun="chapters" aria-label={`${edition.label} chapter catalogue`}>
+  <form class="filter-bar" role="search" action={catalogueUrl(id)} data-enhanced hidden>
+    <div class="search-field"><label for="chapter-search">Find a chapter</label><input id="chapter-search" name="q" type="search" placeholder="Try “simulation”, “Hill”, or “risk”" autocomplete="off" /></div>
+    <div><label for="part">Part of the book</label><select id="part" name="part"><option value="">All {id === '2e' ? 'three' : 'four'} parts</option>{edition.parts.map((name, i) => <option value={i}>{name}</option>)}</select></div>
+    <button type="submit" class="button">Search</button><button type="button" data-clear class="text-button">Clear</button>
+  </form>
+  <noscript><p>All twenty chapters appear below. Your browser’s Find command can search this page.</p></noscript>
+  <p class="result-count" data-count role="status" aria-live="polite">20 chapters</p>
+  <p data-empty hidden class="empty-state">No chapters match that search. Try an author’s surname or clear the part filter.</p>
+  {edition.parts.map((name, i) => <section data-group class="part-section"><h2><span class="eyebrow">Part {['I', 'II', 'III', 'IV'][i]}</span>{name}</h2><ChapterList chapters={records.filter(c => c.part === i)} /></section>)}
+  <p class="source-note">Browse the handbook in its published order or use the companion’s topic index. <a href="/about/#editorial">About the chapter records and reading notes.</a></p>
+</section>
