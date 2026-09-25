@@ -1,0 +1,131 @@
+name: Review the initial live origin
+on:
+  push:
+    branches: [ops/launch-2026-09-24]
+    paths: [.github/workflows/live-review.yml]
+permissions:
+  contents: read
+  actions: read
+  pages: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 32a4ab90e18fa1a5bcd1cb03c28c27e59f22b2c0
+          persist-credentials: false
+      - name: Wait for the specific authorized Pages deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p artifacts
+          for attempt in $(seq 1 48); do
+            gh api repos/k3jph/defenseor.com/actions/runs/36075376885/jobs > artifacts/release-jobs.json
+            outcome=$(jq -r '[.jobs[] | select(.name == "deploy")][0] | if .status == "completed" then .conclusion else "pending" end' artifacts/release-jobs.json)
+            if [ "$outcome" = success ]; then break; fi
+            if [ "$outcome" != pending ]; then echo "Deployment is not successful: $outcome"; exit 1; fi
+            sleep 10
+          done
+          test "$outcome" = success
+          gh api repos/k3jph/defenseor.com/pages > artifacts/pages-after.json
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Inspect actual HTTPS pages, redirects, downloads, and browser controls
+        run: |
+          cat > live-review.mjs <<'JS'
+          import { chromium } from 'playwright';
+          import assert from 'node:assert/strict';
+          import { mkdir, writeFile, readFile } from 'node:fs/promises';
+          import { chapters } from './src/data/catalogue.mjs';
+          await mkdir('artifacts', { recursive: true });
+          const base = 'https://defenseor.com';
+          const report = { checkedAt: new Date().toISOString(), release: '32a4ab90e18fa1a5bcd1cb03c28c27e59f22b2c0', http: [], browser: { status: 'RUNNING', checks: [] } };
+          const routes = ['/', '/chapters/', '/chapters/1e/', '/about/', '/contact/', '/reading-room/from-data-to-a-model/', '/robots.txt', '/sitemap.xml', '/citations/2e-19.bib', '/missing-production-acceptance-route/'];
+          const addresses = [...routes.map(p => base + p), 'http://defenseor.com/chapters/?q=Hill', 'http://www.defenseor.com/chapters/?q=Hill', 'https://www.defenseor.com/chapters/?q=Hill'];
+          for (const url of addresses) {
+            try {
+              const r = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(20000) });
+              const text = await r.text();
+              report.http.push({ url, status: r.status, headers: Object.fromEntries(r.headers), bodyStart: text.slice(0, 400) });
+            } catch (e) { report.http.push({ url, error: e.message, cause: String(e.cause || '') }); }
+          }
+          const browser = await chromium.launch();
+          const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
+          const page = await context.newPage();
+          page.setDefaultTimeout(15000);
+          const errors = [], thirdParty = [];
+          page.on('pageerror', e => errors.push(e.message));
+          page.on('request', r => { if (!r.url().startsWith(base + '/') && !r.url().startsWith('data:')) thirdParty.push(r.url()); });
+          try {
+            const home = await page.goto(base + '/', { waitUntil: 'networkidle', timeout: 30000 });
+            report.browser.homeStatus = home.status();
+            report.browser.homeHeaders = await home.allHeaders();
+            await writeFile('artifacts/live-home.html', await page.content());
+            await page.screenshot({ path: 'artifacts/live-home-desktop.png', fullPage: true });
+            assert.equal(home.status(), 200, 'Actual HTTPS homepage');
+            assert.ok((await page.locator('body').textContent()).includes('A website of Natalie Scala'));
+            assert.ok(!(await page.locator('body').textContent()).includes('COMING SOON'));
+            assert.equal(await page.locator('meta[name="robots"][content*="noindex"]').count(), 0);
+            report.browser.checks.push('New homepage and indexable production build');
+            for (const route of ['/about/', '/contact/', '/reading-room/from-data-to-a-model/', '/chapters/1e/']) {
+              assert.equal((await page.goto(base + route)).status(), 200, route);
+              assert.equal(await page.locator('h1').count(), 1);
+              report.browser.checks.push(route);
+            }
+            await page.goto(base + '/chapters/?q=Hill');
+            assert.equal(await page.locator('[data-search]:visible').count(), 3);
+            const chapter = chapters.find(c => c.id === '2e-19');
+            await page.goto(base + chapter.url);
+            await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: base });
+            await page.locator('[data-copy]').click();
+            assert.ok((await page.evaluate(() => navigator.clipboard.readText())).includes(chapter.doi));
+            const pendingDownload = page.waitForEvent('download');
+            await page.locator('a[download][href$=".bib"]').click();
+            const download = await pendingDownload;
+            assert.equal(download.suggestedFilename(), '2e-19.bib');
+            assert.ok((await readFile(await download.path(), 'utf8')).includes(chapter.doi));
+            report.browser.checks.push('Live search, clipboard, and BibTeX download');
+            await page.goto(base + '/');
+            await page.locator('footer [data-cookie-preferences]').click();
+            assert.ok(await page.locator('#cookie-settings').isVisible());
+            assert.ok((await page.locator('#cookie-settings').textContent()).includes('not enabled'));
+            await page.keyboard.press('Escape');
+            assert.ok(!(await page.locator('#cookie-settings').isVisible()));
+            assert.equal((await context.cookies()).filter(c => c.name.startsWith('_ga')).length, 0);
+            assert.equal(thirdParty.filter(u => /google-analytics|googletagmanager/.test(u)).length, 0);
+            report.browser.checks.push('Live cookie settings and inactive analytics');
+            for (const width of [375, 1440]) {
+              await page.setViewportSize({ width, height: 1000 }); await page.goto(base + '/');
+              await page.locator('footer').scrollIntoViewIfNeeded();
+              await page.waitForFunction(() => [...document.images].every(i => i.complete && i.naturalWidth));
+              assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+              await page.evaluate(() => scrollTo(0, 0));
+              await page.screenshot({ path: `artifacts/live-home-${width}.png`, fullPage: true });
+            }
+            report.browser.checks.push('Live images and mobile/desktop layout');
+            assert.equal(errors.length, 0, errors.join('\n'));
+            report.browser.status = 'PASS';
+          } catch (e) {
+            report.browser.status = 'FAIL'; report.browser.error = e.stack;
+            await page.screenshot({ path: 'artifacts/live-failure.png', fullPage: true }).catch(() => {});
+            process.exitCode = 1;
+          } finally {
+            report.browser.pageErrors = errors; report.browser.thirdPartyRequests = thirdParty;
+            await browser.close();
+            await writeFile('artifacts/live-browser-results.json', JSON.stringify(report, null, 2));
+            console.log(JSON.stringify(report, null, 2));
+          }
+          JS
+          node live-review.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-origin-review
+          path: artifacts/
+          retention-days: 90
