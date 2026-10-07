@@ -8,7 +8,7 @@ const mark = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect 
 await writeFile('public/favicon.svg', mark);
 await sharp(Buffer.from(mark)).resize(32, 32).png().toFile('public/favicon-32.png');
 await sharp(Buffer.from(mark)).resize(180, 180).png().toFile('public/apple-touch-icon.png');
-const cover = (await sharp('public/assets/covers/second-edition.jpg').resize(260, 400, { fit: 'inside' }).png().toBuffer()).toString('base64');
+const cover = (await sharp('public/assets/covers/second-edition-1024.jpg').resize(260, 400, { fit: 'inside' }).png().toBuffer()).toString('base64');
 const card = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630"><rect width="1200" height="630" fill="#faf8f1"/><rect x="0" y="0" width="1200" height="18" fill="#feec96"/><text x="65" y="90" font-family="sans-serif" font-size="22" letter-spacing="4" fill="#272443">DEFENSEOR.COM</text><path d="M65 117h1070" stroke="#272443"/><g font-family="serif" fill="#272443"><text x="65" y="210" font-size="38">Handbook of</text><text x="65" y="290" font-size="57">Military and Defense</text><text x="65" y="365" font-size="57">Operations Research</text></g><text x="65" y="449" font-family="sans-serif" font-size="24" fill="#272443">Chapters · Contributors · Reading room</text><text x="65" y="521" font-family="sans-serif" font-size="19" fill="#272443">A website of Natalie Scala and James Howard</text><image x="885" y="155" width="250" height="370" href="data:image/png;base64,${cover}"/></svg>`;
 await sharp(Buffer.from(card)).png().toFile('public/assets/social/companion.png');
 console.log('Generated square portrait sizes, favicons, and a local sharing image.');

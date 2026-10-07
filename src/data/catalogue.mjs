@@ -11,7 +11,7 @@ export const sources = {
   natalie: 'https://www.drnataliescala.com/books',
 };
 export const editions = {
-  '2e': { label: 'Second edition', year: 2024, doi: '10.1201/9781003396307', isbn: '9781032497488', cover: '/assets/covers/second-edition.jpg', source: sources.second, parts: ['Approaches', 'Applications', 'Soft Skills and Perspectives'] },
+  '2e': { label: 'Second edition', year: 2024, doi: '10.1201/9781003396307', isbn: '9781032497488', cover: '/assets/covers/second-edition-1024.jpg', source: sources.second, parts: ['Approaches', 'Applications', 'Soft Skills and Perspectives'] },
   '1e': { label: 'First edition', year: 2020, doi: '10.1201/9780429467219', isbn: '9781138607330', cover: '/assets/covers/first-edition.webp', source: sources.first, parts: ['Approaches', 'Soft Skills and Client Relations', 'Applications', 'Perspectives'] },
 };
 export const slugify = value => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
