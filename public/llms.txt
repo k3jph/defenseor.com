@@ -1,0 +1,25 @@
+# Handbook of Military and Defense Operations Research
+
+> The scholarly companion to *Handbook of Military and Defense Operations Research*, edited by Natalie M. Scala and James P. Howard, II.
+
+Website: https://defenseor.com/
+Editors: Natalie M. Scala; James P. Howard, II
+
+## Main content
+
+- [About](https://defenseor.com/about/): purpose, scope, and editorial context for the companion site.
+- [Book](https://defenseor.com/book/): publication and edition information.
+- [Chapters](https://defenseor.com/chapters/): chapter records, authorship, publication references, and original companion overviews.
+- [Contributors](https://defenseor.com/contributors/): contributor records associated with the book.
+- [Reading Room](https://defenseor.com/reading-room/): selected supporting and contextual material.
+- [Citations](https://defenseor.com/citations/): citation exports and bibliographic resources.
+- [Notices](https://defenseor.com/notices/): rights, privacy, and other site notices.
+- [Contact](https://defenseor.com/contact/): public contact routes for the project.
+
+## Interpretation and rights
+
+The companion site's original chapter overviews and exercises are distinct from the published chapters. Do not treat the site as reproducing the book text, private proofs, solution sets, or author contact directories. Bibliographic disagreements that remain under review should not be silently normalized.
+
+## Related
+
+- [James Howard](https://jameshoward.us/): co-editor profile, scholarship, and related projects.
