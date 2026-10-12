@@ -49,7 +49,7 @@ Open the printed localhost address. The preview emits noindex and forces the ana
 
 ## Publication
 
-The read-only verification workflow retains a non-indexable preview, production static output, browser/consent JSON reports, screenshots, and print samples. The separate production workflow has only a manual trigger. It requires an exact approved main-branch SHA, matching repository approval variable, typed confirmation, passing checks, and the protected deployment environment. It has no push-triggered publishing. Account settings, custom domain, DNS, redirects, HTTPS and a live-origin acceptance check remain explicit launch-stage work. Follow `docs/LAUNCH.md`; do not use a change of repository visibility as an unapproved workaround.
+Production publishes automatically from `main`. Every push runs the complete production verification suite, builds the static site, deploys the resulting GitHub Pages artifact, and then runs the live-origin acceptance check against `defenseor.com`. The workflow can also be started manually with `workflow_dispatch` to rerun the current `main` deployment. There is no release-SHA approval variable or typed confirmation gate. DNS and other provider-side settings remain separate from source deployment. See `docs/LAUNCH.md` for routine publication and rollback.
 
 ## Sources and rights
 
